@@ -1,7 +1,8 @@
 import styled from "styled-components";
-import { motion, useMotionValue, useTransform, Variants } from "framer-motion";
+import { motion, useMotionValue, useScroll, useTransform } from "framer-motion";
+import { useEffect } from "react";
 const Wrapper = styled(motion.div)`
-	height: 100vh;
+	height: 500vh;
 	width: 100vw;
 	display: flex;
 	justify-content: center;
@@ -10,6 +11,8 @@ const Wrapper = styled(motion.div)`
 `;
 
 const Box = styled(motion.div)`
+	position: fixed;
+	top: 50%;
 	width: 200px;
 	height: 200px;
 	background-color: rgba(255, 255, 255, 1);
@@ -19,7 +22,6 @@ const Box = styled(motion.div)`
 
 function App() {
 	const x = useMotionValue(0);
-	const scale = useTransform(x, [-800, 0, 800], [2, 1, 0.1]);
 	const rotate = useTransform(x, [-800, 800], [-360, 360]);
 	const backgroundGradient = useTransform(
 		x,
@@ -30,18 +32,17 @@ function App() {
 			"linear-gradient(135deg, rgb(63, 255, 63), rgb(214, 255, 168))",
 		]
 	);
-	const boxGradient = useTransform(
-		x,
-		[-800, 0, 800],
-		["rgb(189, 13, 13)", "rgb(18, 206, 115)", "rgb(10, 42, 222)"]
-	);
+
+	const { scrollYProgress } = useScroll();
+	const scale = useTransform(scrollYProgress, [0, 1], [1, 5]);
+
 	return (
 		<Wrapper style={{ background: backgroundGradient }}>
 			<Box
-				style={{ x: x, scale: scale, rotate: rotate, background: boxGradient }}
+				style={{ x: x, rotate: rotate, scale: scale }}
 				drag="x"
 				dragSnapToOrigin
-			/>
+			></Box>
 		</Wrapper>
 	);
 }
