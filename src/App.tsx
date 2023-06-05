@@ -1,23 +1,12 @@
 import styled from "styled-components";
-import { motion, useMotionValue, Variants } from "framer-motion";
-import { useEffect } from "react";
-const Wrapper = styled.div`
+import { motion, useMotionValue, useTransform, Variants } from "framer-motion";
+const Wrapper = styled(motion.div)`
 	height: 100vh;
 	width: 100vw;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-`;
-
-const BiggerBox = styled.div`
-	width: 600px;
-	height: 600px;
-	background-color: rgba(255, 255, 255, 0.3);
-	border-radius: 30px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	overflow: hidden;
+	background: linear-gradient(135deg, rgb(238, 0, 153), rgb(221, 0, 238));
 `;
 
 const Box = styled(motion.div)`
@@ -30,23 +19,30 @@ const Box = styled(motion.div)`
 
 function App() {
 	const x = useMotionValue(0);
-	// 현재 MotionValue값 출력
-	useEffect(() => {
-		x.onChange(() => console.log(x.get()));
-	}, [x]);
+	const scale = useTransform(x, [-800, 0, 800], [2, 1, 0.1]);
+	const rotate = useTransform(x, [-800, 800], [-360, 360]);
+	const backgroundGradient = useTransform(
+		x,
+		[-800, 0, 800],
+		[
+			"linear-gradient(135deg, rgb(0, 210, 238), rgb(0, 83, 238))",
+			"linear-gradient(135deg, rgb(238, 0, 153), rgb(221, 0, 238))",
+			"linear-gradient(135deg, rgb(63, 255, 63), rgb(214, 255, 168))",
+		]
+	);
+	const boxGradient = useTransform(
+		x,
+		[-800, 0, 800],
+		["rgb(189, 13, 13)", "rgb(18, 206, 115)", "rgb(10, 42, 222)"]
+	);
 	return (
-		<Wrapper>
-			<button
-				onClick={() => {
-					// MotionValue값 업데이트
-					x.set(200);
-				}}
-			>
-				Update!
-			</button>
-			<Box style={{ x: x }} drag="x" dragSnapToOrigin />
+		<Wrapper style={{ background: backgroundGradient }}>
+			<Box
+				style={{ x: x, scale: scale, rotate: rotate, background: boxGradient }}
+				drag="x"
+				dragSnapToOrigin
+			/>
 		</Wrapper>
 	);
 }
-
 export default App;
