@@ -1,24 +1,18 @@
 import styled from "styled-components";
-import {
-	Variants,
-	motion,
-	useMotionValue,
-	useScroll,
-	useTransform,
-} from "framer-motion";
-import { useEffect } from "react";
+import { AnimatePresence, Variants, motion } from "framer-motion";
+import { useState } from "react";
 const Wrapper = styled(motion.div)`
-	height: 500vh;
+	position: relative;
+	height: 100vh;
 	width: 100vw;
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	background: linear-gradient(135deg, rgb(238, 0, 153), rgb(140, 0, 255));
 `;
 
 const Box = styled(motion.div)`
-	position: fixed;
-	top: 50%;
 	width: 200px;
 	height: 200px;
 	background-color: rgba(255, 255, 255, 1);
@@ -26,36 +20,49 @@ const Box = styled(motion.div)`
 	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
 `;
 
-const Svg = styled(motion.svg)`
-	position: fixed;
-	top: 30%;
-	width: 300px;
-	height: 300px;
-	path {
-		stroke: white;
-		fill: white;
-		stroke-width: 2;
-	}
-`;
+const boxVariants: Variants = {
+	initial: { opacity: 0, scale: 0 },
+	visible: { opacity: 1, scale: 1, rotateZ: 360 },
+	leaving: { opacity: 0, scale: 0, y: 50 },
+};
+
 function App() {
-	const { scrollYProgress } = useScroll();
-	useEffect(() => {
-		scrollYProgress.onChange(() => console.log(scrollYProgress.get()));
-	}, [scrollYProgress]);
-	const pathLength = useTransform(scrollYProgress, [0, 1], [0, 5]);
+	const [showing, setShowing] = useState(false);
+	const showingHandler = () => {
+		setShowing(!showing);
+	};
 	return (
 		<Wrapper>
-			<Svg
-				xmlns="http://www.w3.org/2000/svg"
-				height="1em"
-				viewBox="0 0 448 512"
+			<AnimatePresence>
+				{showing ? (
+					<Box
+						variants={boxVariants}
+						initial="initial"
+						animate="visible"
+						// 박스가 사라질 때 하는 행동
+						exit="leaving"
+					/>
+				) : null}
+			</AnimatePresence>
+			<button
+				style={{ position: "absolute", marginTop: 300 }}
+				onClick={showingHandler}
 			>
-				<motion.path
-					style={{ pathLength, opacity: scrollYProgress }}
-					d="M224 373.12c-25.24-31.67-40.08-59.43-45-83.18-22.55-88 112.61-88 90.06 0-5.45 24.25-20.29 52-45 83.18zm138.15 73.23c-42.06 18.31-83.67-10.88-119.3-50.47 103.9-130.07 46.11-200-18.85-200-54.92 0-85.16 46.51-73.28 100.5 6.93 29.19 25.23 62.39 54.43 99.5-32.53 36.05-60.55 52.69-85.15 54.92-50 7.43-89.11-41.06-71.3-91.09 15.1-39.16 111.72-231.18 115.87-241.56 15.75-30.07 25.56-57.4 59.38-57.4 32.34 0 43.4 25.94 60.37 59.87 36 70.62 89.35 177.48 114.84 239.09 13.17 33.07-1.37 71.29-37.01 86.64zm47-136.12C280.27 35.93 273.13 32 224 32c-45.52 0-64.87 31.67-84.66 72.79C33.18 317.1 22.89 347.19 22 349.81-3.22 419.14 48.74 480 111.63 480c21.71 0 60.61-6.06 112.37-62.4 58.68 63.78 101.26 62.4 112.37 62.4 62.89.05 114.85-60.86 89.61-130.19.02-3.89-16.82-38.9-16.82-39.58z"
-				/>
-			</Svg>
+				Click me
+			</button>
 		</Wrapper>
 	);
 }
 export default App;
+
+// AnimatePresence
+// ReactJS어플에서 사라지는 콤퍼넌트를 에니메이션함
+// 리액트 트리에서 컴포넌트가 제거될 때 제거되는 컴포넌트에 애니메이션 효과를 줄 수 있음
+// 컴포넌트가 마운트되거나 언마운트될 때 애니메이션을 처리,ㅣ
+
+// Box가 사라질 때 Box를 animate
+
+// AnimatePresence는 visible상태여야함 - AnimatePresence의 내부에는 조건문이 존재하여야함
+// AP는 자신의 안에 나타나거나 사라지는 것이 있다면 그것을 animate할 수 있도록 해줌
+
+// exit : 이 element가 사라질 때 어떤 애니메이션을 발생시키는 지를 정함
